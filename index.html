@@ -997,7 +997,11 @@ function toggleCheck(catId) {
    isFullyLogged  — "submitted" = learning + hobby both present
 ═══════════════════════════════════════════════════════════════ */
 function isFullyLogged(entry) {
-  return !!(entry && typeof entry === 'object');
+  if (!entry || typeof entry !== 'object') return false;
+  return !!(
+    entry.learn && String(entry.learn).trim() &&
+    entry.hobby && String(entry.hobby).trim()
+  );
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1103,6 +1107,8 @@ function submitLog() {
   const hobby = hobbyEl ? hobbyEl.value.trim() : '';
   const fin   = finEl   ? finEl.value.trim()   : '';
 
+  if (!learn) { showToast('Learning log is required!', 'error'); return; }
+  if (!hobby) { showToast('Hobby log is required!', 'error');    return; }
 
   const who = myRole || 'you';
   const tk  = todayKey();
