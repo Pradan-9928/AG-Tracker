@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Accountability & Growth Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ─── RESET & ROOT ─────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg:     #090909;
+  --bg2:    #111111;
+  --bg3:    #191919;
+  --bg4:    #222222;
+  --bg5:    #2a2a2a;
+  --border: #252525;
+  --border2:#333333;
+  --text:   #f0ede8;
+  --text2:  #999;
+  --text3:  #555;
+  --green:  #2ecc71;
+  --green2: #1a6e42;
+  --green3: #0d2e1b;
+  --amber:  #f0a500;
+  --amber2: #6e4a00;
+  --amber3: #2e1f00;
+  --blue:   #4a9eff;
+  --blue2:  #1a4480;
+  --blue3:  #0d1e38;
+  --red:    #e74c3c;
+  --red2:   #6e1a1a;
+  --red3:   #2e0d0d;
+  --purple: #9b6dff;
+  --purple2:#3d1a7a;
+  --purple3:#1a0d38;
+}
+html, body { height: 100%; }
+body {
+  font-family: 'Syne', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+a { color: inherit; text-decoration: none; }
+button { cursor: pointer; font-family: 'Syne', sans-serif; }
+input, textarea, select { font-family: 'Syne', sans-serif; }
+.mono { font-family: 'JetBrains Mono', monospace; }
+
+/* ─── UTILITY ─────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+.flex { display: flex; }
+.col { flex-direction: column; }
+.center { align-items: center; justify-content: center; }
+.gap8 { gap: 8px; }
+.gap12 { gap: 12px; }
+.gap16 { gap: 16px; }
+
+/* ─── ANIMATIONS ──────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+@keyframes countUp {
+  from { opacity: 0; transform: scale(0.85); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.anim-fade { animation: fadeIn 0.35s ease both; }
+.anim-slide { animation: slideUp 0.4s cubic-bezier(0.16,1,0.3,1) both; }
+
+/* ══════════════════════════════════════════════════════════════════
+   LOGIN SCREEN
+══════════════════════════════════════════════════════════════════ */
+#loginScreen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse 60% 50% at 50% -10%, rgba(46,204,113,0.07), transparent),
+    var(--bg);
+}
+.login-logo {
+  margin-bottom: 40px;
+  text-align: center;
+}
+.login-logo-badge {
+  width: 56px; height: 56px;
+  background: var(--green);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; font-weight: 800; color: #000;
+  margin: 0 auto 14px;
+  box-shadow: 0 0 32px rgba(46,204,113,0.3);
+}
+.login-logo h1 {
+  font-size: 26px; font-weight: 800; letter-spacing: -0.5px;
+  line-height: 1.1;
+}
+.login-logo p {
+  font-size: 11px; font-weight: 600; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--text3); margin-top: 6px;
+}
+.login-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%; max-width: 420px;
+  animation: slideUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
+}
+.login-card h2 {
+  font-size: 14px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 24px;
+  display: flex; align-items: center; gap: 8px;
+}
+.login-card h2::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+.login-player-block {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+  margin-bottom: 14px;
+  transition: border-color 0.2s;
+}
+.login-player-block:focus-within { border-color: var(--green2); }
+.login-player-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 10px;
+  display: flex; align-items: center; gap: 6px;
+}
+.dot-you  { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.dot-them { width: 8px; height: 8px; border-radius: 50%; background: var(--purple); }
+.login-input {
+  width: 100%;
+  background: var(--bg4);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 11px 14px;
+  font-size: 14px; font-weight: 600;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.login-input:focus {
+  border-color: var(--green2);
+  box-shadow: 0 0 0 3px rgba(46,204,113,0.08);
+}
+.login-input::placeholder { color: var(--text3); font-weight: 400; }
+.login-btn {
+  width: 100%; margin-top: 20px;
+  padding: 14px;
+  background: var(--green);
+  color: #000;
+  font-size: 12px; font-weight: 800; letter-spacing: 3px;
+  text-transform: uppercase;
+  border: none; border-radius: 9px;
+  transition: background 0.15s, transform 0.1s;
+}
+.login-btn:hover { background: #29b862; }
+.login-btn:active { transform: scale(0.99); }
+.login-note {
+  font-size: 11px; color: var(--text3); text-align: center; margin-top: 14px;
+  line-height: 1.6;
+}
+.login-note b { color: var(--text2); }
+
+/* ══════════════════════════════════════════════════════════════════
+   MAIN APP
+══════════════════════════════════════════════════════════════════ */
+#app { display: none; min-height: 100vh; flex-direction: column; }
+#app.visible { display: flex; }
+
+/* ─── TOP BAR ─────────────────────────────────────────────────── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: blur(8px);
+}
+.topbar-logo {
+  display: flex; align-items: center; gap: 10px;
+}
+.topbar-badge {
+  width: 30px; height: 30px;
+  background: var(--green); border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800; color: #000;
+}
+.topbar-name {
+  font-size: 14px; font-weight: 800; letter-spacing: -0.3px;
+}
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.topbar-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--text3);
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 4px; padding: 4px 9px;
+}
+.logout-btn {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 6px; padding: 6px 12px;
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text3);
+  transition: all 0.15s;
+}
+.logout-btn:hover { color: var(--red); border-color: var(--red2); }
+
+/* ─── MAIN CONTENT ────────────────────────────────────────────── */
+.main { flex: 1; padding: 24px; max-width: 1100px; width: 100%; margin: 0 auto; }
+
+/* ─── GAP HERO ────────────────────────────────────────────────── */
+.gap-hero {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px 24px;
+  margin-bottom: 20px;
+  position: relative; overflow: hidden;
+}
+.gap-hero::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+.gap-eyebrow {
+  font-size: 9px; font-weight: 700; letter-spacing: 4px;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 14px;
+  display: flex; align-items: center; gap: 6px;
+}
+.gap-pulse {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--green);
+  animation: pulse 2s infinite;
+}
+.gap-body { display: flex; align-items: center; gap: 16px; }
+.gap-player { text-align: center; flex-shrink: 0; }
+.gap-player-name {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 4px;
+}
+.gap-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 44px; font-weight: 600; line-height: 1;
+  transition: color 0.4s;
+}
+.gap-pts-label { font-size: 9px; color: var(--text3); margin-top: 3px; letter-spacing: 1px; }
+.gap-center { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.gap-vs { font-size: 9px; font-weight: 700; letter-spacing: 2px; color: var(--text3); }
+.gap-track {
+  width: 100%; height: 8px;
+  background: var(--bg4); border-radius: 4px; overflow: hidden;
+  position: relative;
+}
+.gap-fill {
+  height: 100%; border-radius: 4px;
+  background: var(--green);
+  transition: width 0.7s cubic-bezier(0.16,1,0.3,1);
+}
+.gap-labels {
+  display: flex; justify-content: space-between;
+  width: 100%; font-size: 9px; color: var(--text3); letter-spacing: 1px;
+}
+.gap-delta { text-align: center; flex-shrink: 0; min-width: 90px; }
+.gap-delta-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 30px; font-weight: 600;
+  transition: color 0.4s;
+}
+.gap-delta-label { font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-top: 2px; }
+.gap-week {
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);
+  font-size: 10px; color: var(--text3);
+}
+.gap-week b { color: var(--text2); font-family: 'JetBrains Mono', monospace; }
+
+/* ─── TABS ────────────────────────────────────────────────────── */
+.tabs {
+  display: flex; gap: 4px; margin-bottom: 20px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 4px;
+}
+.tab-btn {
+  flex: 1; text-align: center; padding: 9px 12px;
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text3);
+  border: none; background: none; border-radius: 7px;
+  transition: all 0.15s;
+}
+.tab-btn:hover { color: var(--text2); }
+.tab-btn.active {
+  background: var(--bg4); color: var(--text);
+  border: 1px solid var(--border2);
+}
+.tab-panel { display: none; }
+.tab-panel.active { display: block; animation: fadeIn 0.25s ease both; }
+
+/* ─── DUAL PLAYER CARDS ──────────────────────────────────────── */
+.dual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.player-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 13px; overflow: hidden;
+}
+.player-card.is-you { border-color: var(--green2); }
+.player-card.is-them { border-color: var(--purple2); }
+
+.pcard-header {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.pcard-left { display: flex; align-items: center; gap: 10px; }
+.avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 13px; letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+.avatar-you { background: var(--green3); color: var(--green); border: 1px solid var(--green2); }
+.avatar-them { background: var(--purple3); color: var(--purple); border: 1px solid var(--purple2); }
+.pcard-name { font-size: 14px; font-weight: 700; }
+.pcard-tag {
+  font-size: 9px; font-weight: 600; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text3); margin-top: 1px;
+}
+.pcard-score-wrap { text-align: right; }
+.pcard-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 26px; font-weight: 600;
+}
+.pcard-score.you-color { color: var(--green); }
+.pcard-score.them-color { color: var(--purple); }
+.pcard-max { font-size: 9px; color: var(--text3); letter-spacing: 1px; margin-top: 1px; }
+
+.pcard-body { padding: 12px 16px; }
+
+/* ─── PILLARS ─────────────────────────────────────────────────── */
+.pillar-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+}
+.pillar-row:last-of-type { border-bottom: none; }
+.pillar-icon {
+  width: 30px; height: 30px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.pi-phys { background: var(--green3); border: 1px solid var(--green2); }
+.pi-ment { background: var(--blue3);  border: 1px solid var(--blue2); }
+.pi-fin  { background: var(--amber3); border: 1px solid var(--amber2); }
+.pillar-info { flex: 1; min-width: 0; }
+.pillar-name-txt {
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text3);
+}
+.pillar-desc {
+  font-size: 11px; color: var(--text2); margin-top: 2px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 140px;
+}
+.pillar-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; }
+.pillar-pts {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 600;
+}
+.pts-done    { color: var(--green); }
+.pts-empty   { color: var(--text3); }
+.pts-bonus   { color: var(--amber); }
+.badge {
+  font-size: 8px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; border-radius: 3px; padding: 1px 5px;
+}
+.badge-logged  { background: var(--green3); color: var(--green); border: 1px solid var(--green2); }
+.badge-missing { background: var(--red3);   color: var(--red);   border: 1px solid var(--red2); }
+.badge-bonus   { background: var(--amber3); color: var(--amber); border: 1px solid var(--amber2); }
+.badge-skip    { background: var(--bg4);    color: var(--text3); border: 1px solid var(--border2); }
+
+/* ─── STREAK ──────────────────────────────────────────────────── */
+.streak-section {
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+.streak-meta { display: flex; gap: 14px; align-items: center; }
+.streak-stat { text-align: center; }
+.streak-stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 17px; font-weight: 600;
+}
+.streak-stat-lbl {
+  font-size: 8px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text3); margin-top: 1px;
+}
+.streak-bar { display: flex; gap: 3px; flex: 1; }
+.streak-day {
+  flex: 1; height: 18px; border-radius: 3px;
+  background: var(--bg4);
+}
+.streak-day.s-full-you  { background: var(--green2); }
+.streak-day.s-full-them { background: var(--purple2); }
+.streak-day.s-partial   { background: var(--amber2); }
+
+/* ─── LOG FORM ────────────────────────────────────────────────── */
+.log-section {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 13px; padding: 20px; margin-bottom: 20px;
+}
+.section-label {
+  font-size: 9px; font-weight: 700; letter-spacing: 4px;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 16px;
+  display: flex; align-items: center; gap: 10px;
+}
+.section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.log-who-tabs {
+  display: flex; gap: 4px; margin-bottom: 16px;
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; padding: 3px;
+}
+.log-who-btn {
+  flex: 1; padding: 8px; text-align: center;
+  font-size: 11px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--text3);
+  border: none; background: none; border-radius: 5px; transition: all 0.15s;
+}
+.log-who-btn.active-you  { background: var(--green3); color: var(--green); border: 1px solid var(--green2); }
+.log-who-btn.active-them { background: var(--purple3); color: var(--purple); border: 1px solid var(--purple2); }
+.log-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+.log-item {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 9px; padding: 13px;
+}
+.log-item.mand  { border-left: 2px solid var(--green); }
+.log-item.opt   { border-left: 2px solid var(--amber); }
+.log-item-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 9px;
+}
+.log-item-lbl {
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text2);
+  display: flex; align-items: center; gap: 5px;
+}
+.pts-badge {
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  border-radius: 3px; padding: 1px 6px;
+}
+.pts-badge-green { background: var(--green3); color: var(--green); border: 1px solid var(--green2); }
+.pts-badge-amber { background: var(--amber3); color: var(--amber); border: 1px solid var(--amber2); }
+.log-field-input {
+  width: 100%;
+  background: var(--bg4); border: 1px solid var(--border2);
+  border-radius: 6px; padding: 8px 10px;
+  font-size: 12px; color: var(--text);
+  outline: none; resize: none; line-height: 1.5;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.log-field-input:focus {
+  border-color: var(--green2);
+  box-shadow: 0 0 0 2px rgba(46,204,113,0.07);
+}
+.log-field-input::placeholder { color: var(--text3); }
+.log-field-input.them-focus:focus {
+  border-color: var(--purple2);
+  box-shadow: 0 0 0 2px rgba(155,109,255,0.07);
+}
+.submit-btn {
+  width: 100%; padding: 13px;
+  background: var(--green); color: #000;
+  font-size: 11px; font-weight: 800; letter-spacing: 3px;
+  text-transform: uppercase;
+  border: none; border-radius: 8px;
+  transition: background 0.15s, transform 0.1s, box-shadow 0.2s;
+}
+.submit-btn:hover { background: #29b862; box-shadow: 0 4px 20px rgba(46,204,113,0.2); }
+.submit-btn:active { transform: scale(0.99); }
+.submit-btn.them-btn { background: var(--purple); }
+.submit-btn.them-btn:hover { background: #8b5cf6; box-shadow: 0 4px 20px rgba(155,109,255,0.2); }
+.already-logged-msg {
+  text-align: center; padding: 14px;
+  font-size: 12px; color: var(--green);
+  background: var(--green3); border: 1px solid var(--green2);
+  border-radius: 8px; margin-top: 0;
+}
+.already-logged-msg.them-msg {
+  color: var(--purple); background: var(--purple3); border-color: var(--purple2);
+}
+
+/* ─── CALENDAR ────────────────────────────────────────────────── */
+.cal-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 13px; padding: 20px; margin-bottom: 16px;
+}
+.cal-hdr {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.cal-title { font-size: 14px; font-weight: 700; letter-spacing: -0.3px; }
+.cal-nav { display: flex; gap: 6px; }
+.cal-nav-btn {
+  background: var(--bg3); border: 1px solid var(--border2);
+  border-radius: 6px; width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; color: var(--text2);
+  transition: all 0.15s;
+}
+.cal-nav-btn:hover { border-color: var(--green2); color: var(--green); }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.cal-dayname {
+  font-size: 9px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--text3);
+  text-align: center; padding: 5px 0;
+}
+.cal-day {
+  aspect-ratio: 1; border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 600; cursor: default;
+  position: relative; overflow: hidden; transition: all 0.12s;
+}
+.cal-day.cd-empty  { background: none; }
+.cal-day.cd-full   { background: var(--green2); color: var(--green); }
+.cal-day.cd-half   { background: var(--amber2); color: var(--amber); }
+.cal-day.cd-miss   { background: var(--red3); color: var(--text3); }
+.cal-day.cd-future { background: var(--bg3); color: var(--text3); }
+.cal-day.cd-today  { box-shadow: 0 0 0 1.5px var(--green); }
+.cal-legend {
+  display: flex; gap: 14px; margin-top: 10px; flex-wrap: wrap;
+}
+.cal-leg {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; color: var(--text3);
+}
+.cal-leg-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+/* ─── STATS ───────────────────────────────────────────────────── */
+.stats-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 16px; }
+.stat-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 11px; padding: 15px;
+}
+.stat-val {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 26px; font-weight: 600; margin-bottom: 2px;
+}
+.stat-lbl {
+  font-size: 9px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--text3);
+}
+.chart-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 13px; padding: 20px; margin-bottom: 16px;
+}
+.chart-card-title {
+  font-size: 9px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--text3); margin-bottom: 14px;
+}
+.chart-legend { display: flex; gap: 14px; margin-top: 10px; }
+.chart-leg-item {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 10px; color: var(--text3);
+}
+.chart-leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* ─── TOAST ───────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  background: var(--bg3); border: 1px solid var(--green2);
+  border-radius: 9px; padding: 12px 18px;
+  font-size: 12px; font-weight: 600; color: var(--green);
+  display: flex; align-items: center; gap: 8px;
+  transform: translateY(60px); opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
+  pointer-events: none;
+}
+.toast.toast-show { transform: translateY(0); opacity: 1; }
+.toast.toast-error { color: var(--red); border-color: var(--red2); }
+.toast.toast-them  { color: var(--purple); border-color: var(--purple2); }
+
+/* ─── LEVEL BADGE ─────────────────────────────────────────────── */
+.level-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; border-radius: 4px; padding: 2px 7px;
+  background: var(--bg4); border: 1px solid var(--border2); color: var(--text3);
+  margin-left: 6px;
+}
+.level-badge.lv1 { background: var(--bg4); color: var(--text3); }
+.level-badge.lv2 { background: #1a2a0d; color: #7ec850; border-color: #3a5a1a; }
+.level-badge.lv3 { background: var(--blue3); color: var(--blue); border-color: var(--blue2); }
+.level-badge.lv4 { background: var(--amber3); color: var(--amber); border-color: var(--amber2); }
+.level-badge.lv5 { background: var(--purple3); color: var(--purple); border-color: var(--purple2); }
+.level-badge.lv6 { background: #1a0d0d; color: #ff6b6b; border-color: #5a1a1a; }
+
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media (max-width: 660px) {
+  .dual-grid { grid-template-columns: 1fr; }
+  .log-grid  { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2,1fr); }
+  .gap-score { font-size: 32px; }
+  .gap-delta-num { font-size: 22px; }
+  .main { padding: 14px; }
+  .topbar { padding: 12px 14px; }
+}
+@media (max-width: 400px) {
+  .stats-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══════════════════════════════════════════════ -->
+<div id="loginScreen">
+  <div class="login-logo">
+    <div class="login-logo-badge">AG</div>
+    <h1>Accountability &<br>Growth Tracker</h1>
+    <p>Compete. Log. Level Up.</p>
+  </div>
+
+  <!-- STEP 1: First-time setup (names) — shown only when no session exists in Firebase -->
+  <div class="login-card" id="setupCard">
+    <h2>First-time setup</h2>
+
+    <div class="login-player-block">
+      <div class="login-player-label"><div class="dot-you"></div> Player 1 name</div>
+      <input class="login-input" id="nameYou" type="text" placeholder="e.g. Pradan" maxlength="20" autocomplete="off">
+    </div>
+
+    <div class="login-player-block">
+      <div class="login-player-label"><div class="dot-them"></div> Player 2 name</div>
+      <input class="login-input" id="nameThem" type="text" placeholder="e.g. Rival" maxlength="20" autocomplete="off">
+    </div>
+
+    <button class="login-btn" onclick="createSession()">Create shared session →</button>
+    <p class="login-note">
+      Do this <b>once</b> from either device. Then both players join using<br>
+      the <b>Join as Player</b> button that appears on the other device.
+    </p>
+  </div>
+
+  <!-- STEP 2: Choose who YOU are on THIS device -->
+  <div class="login-card hidden" id="joinCard">
+    <h2>Who are you on this device?</h2>
+    <p style="font-size:12px;color:var(--text2);margin-bottom:20px;line-height:1.6;">
+      The session is live. Each device logs for <b>one player</b>.<br>
+      Pick your identity — you won't be able to change this without resetting.
+    </p>
+    <div id="joinBtnWrap" style="display:flex;flex-direction:column;gap:10px;"></div>
+    <p class="login-note" style="margin-top:14px;">
+      Both players can see all data in real-time.
+    </p>
+  </div>
+
+  <!-- Loading state -->
+  <div class="login-card hidden" id="loadingCard" style="text-align:center;">
+    <div style="font-size:22px;margin-bottom:12px;">⏳</div>
+    <div style="font-size:13px;font-weight:600;color:var(--text2);">Connecting to Firebase…</div>
+    <div style="font-size:11px;color:var(--text3);margin-top:6px;">Make sure your config is filled in.</div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══════════════════════════════════════════════════ -->
+<div id="app">
+
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="topbar-logo">
+      <div class="topbar-badge">AG</div>
+      <span class="topbar-name">Accountability Tracker</span>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="topDate"></div>
+      <button class="logout-btn" onclick="logout()">↩ Reset</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- GAP HERO -->
+    <div class="gap-hero anim-slide">
+      <div class="gap-eyebrow"><div class="gap-pulse"></div> Live gap indicator</div>
+      <div class="gap-body">
+        <div class="gap-player">
+          <div class="gap-player-name" id="gapNameYou">YOU</div>
+          <div class="gap-score mono" id="gapScoreYou">0</div>
+          <div class="gap-pts-label">TODAY</div>
+        </div>
+        <div class="gap-center">
+          <div class="gap-vs">VS</div>
+          <div class="gap-track"><div class="gap-fill" id="gapFill" style="width:50%"></div></div>
+          <div class="gap-labels">
+            <span id="gapLabelL">YOU</span>
+            <span id="gapLabelR">THEM</span>
+          </div>
+          <div class="gap-week">
+            All-time: <b id="gapWeekYou">0</b> pts vs <b id="gapWeekThem">0</b> pts
+          </div>
+        </div>
+        <div class="gap-delta">
+          <div class="gap-delta-num mono" id="gapDelta">—</div>
+          <div class="gap-delta-label" id="gapDeltaLabel">TIED</div>
+        </div>
+        <div class="gap-player">
+          <div class="gap-player-name" id="gapNameThem">THEM</div>
+          <div class="gap-score mono" id="gapScoreThem">0</div>
+          <div class="gap-pts-label">TODAY</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('today')">Today</button>
+      <button class="tab-btn" onclick="switchTab('history')">History</button>
+      <button class="tab-btn" onclick="switchTab('stats')">Stats</button>
+    </div>
+
+    <!-- ── TODAY PANEL ─────────────────────────────────────────── -->
+    <div class="tab-panel active" id="panel-today">
+
+      <!-- Dual Cards -->
+      <div class="dual-grid">
+        <!-- YOUR CARD -->
+        <div class="player-card is-you">
+          <div class="pcard-header">
+            <div class="pcard-left">
+              <div class="avatar avatar-you" id="avatarYou">YO</div>
+              <div>
+                <div class="pcard-name" id="cardNameYou">You <span id="levelYou" class="level-badge lv1">Lv 1</span></div>
+                <div class="pcard-tag" id="cardTagYou">0 pts logged today</div>
+              </div>
+            </div>
+            <div class="pcard-score-wrap">
+              <div class="pcard-score you-color mono" id="cardScoreYou">0</div>
+              <div class="pcard-max">/ <span id="maxPtsLabel">50</span> pts</div>
+            </div>
+          </div>
+          <div class="pcard-body">
+            <!-- Physical -->
+            <div class="pillar-row">
+              <div class="pillar-icon pi-phys">💪</div>
+              <div class="pillar-info">
+                <div class="pillar-name-txt">Physical</div>
+                <div class="pillar-desc" id="youPhysDesc">—</div>
+              </div>
+              <div class="pillar-right">
+                <div class="pillar-pts" id="youPhysPts">+0</div>
+                <div class="badge" id="youPhysBadge">—</div>
+              </div>
+            </div>
+            <!-- Mental -->
+            <div class="pillar-row">
+              <div class="pillar-icon pi-ment">📖</div>
+              <div class="pillar-info">
+                <div class="pillar-name-txt">Mental</div>
+                <div class="pillar-desc" id="youMentDesc">—</div>
+              </div>
+              <div class="pillar-right">
+                <div class="pillar-pts" id="youMentPts">+0</div>
+                <div class="badge" id="youMentBadge">—</div>
+              </div>
+            </div>
+            <!-- Financial -->
+            <div class="pillar-row">
+              <div class="pillar-icon pi-fin">💰</div>
+              <div class="pillar-info">
+                <div class="pillar-name-txt">Financial</div>
+                <div class="pillar-desc" id="youFinDesc">—</div>
+              </div>
+              <div class="pillar-right">
+                <div class="pillar-pts" id="youFinPts">+0</div>
+                <div class="badge" id="youFinBadge">—</div>
+              </div>
+            </div>
+            <!-- Streak -->
+            <div class="streak-section">
+              <div class="streak-meta">
+                <div class="streak-stat">
+                  <div class="streak-stat-val you-color mono" id="streakYou">0</div>
+                  <div class="streak-stat-lbl">Streak</div>
+                </div>
+                <div class="streak-stat">
+                  <div class="streak-stat-val you-color mono" id="rateYou">—</div>
+                  <div class="streak-stat-lbl">Rate</div>
+                </div>
+                <div class="streak-bar" id="streakBarYou"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- THEIR CARD -->
+        <div class="player-card is-them">
+          <div class="pcard-header">
+            <div class="pcard-left">
+              <div class="avatar avatar-them" id="avatarThem">RV</div>
+              <div>
+                <div class="pcard-name" id="cardNameThem">Rival <span id="levelThem" class="level-badge lv1">Lv 1</span></div>
+                <div class="pcard-tag" id="cardTagThem">0 pts logged today</div>
+              </div>
+            </div>
+            <div class="pcard-score-wrap">
+              <div class="pcard-score them-color mono" id="cardScoreThem">0</div>
+              <div class="pcard-max">/ <span>50</span> pts</div>
+            </div>
+          </div>
+          <div class="pcard-body">
+            <div class="pillar-row">
+              <div class="pillar-icon pi-phys">💪</div>
+              <div class="pillar-info">
+                <div class="pillar-name-txt">Physical</div>
+                <div class="pillar-desc" id="themPhysDesc">—</div>
+              </div>
+              <div class="pillar-right">
+                <div class="pillar-pts" id="themPhysPts">+0</div>
+                <div class="badge" id="themPhysBadge">—</div>
+              </div>
+            </div>
+            <div class="pillar-row">
+              <div class="pillar-icon pi-ment">📖</div>
+              <div class="pillar-info">
+                <div class="pillar-name-txt">Mental</div>
+                <div class="pillar-desc" id="themMentDesc">—</div>
+              </div>
+              <div class="pillar-right">
+                <div class="pillar-pts" id="themMentPts">+0</div>
+                <div class="badge" id="themMentBadge">—</div>
+              </div>
+            </div>
+            <div class="pillar-row">
+              <div class="pillar-icon pi-fin">💰</div>
+              <div class="pillar-info">
+                <div class="pillar-name-txt">Financial</div>
+                <div class="pillar-desc" id="themFinDesc">—</div>
+              </div>
+              <div class="pillar-right">
+                <div class="pillar-pts" id="themFinPts">+0</div>
+                <div class="badge" id="themFinBadge">—</div>
+              </div>
+            </div>
+            <div class="streak-section">
+              <div class="streak-meta">
+                <div class="streak-stat">
+                  <div class="streak-stat-val them-color mono" id="streakThem">0</div>
+                  <div class="streak-stat-lbl">Streak</div>
+                </div>
+                <div class="streak-stat">
+                  <div class="streak-stat-val them-color mono" id="rateThem">—</div>
+                  <div class="streak-stat-lbl">Rate</div>
+                </div>
+                <div class="streak-bar" id="streakBarThem"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LOG FORM -->
+      <div class="log-section">
+        <div class="section-label">Log today's progress</div>
+        <!-- Who is logging -->
+        <div class="log-who-tabs">
+          <button class="log-who-btn active-you" id="whoYouBtn" onclick="setLogWho('you')">
+            📝 Logging as <span id="whoYouName">You</span>
+          </button>
+          <button class="log-who-btn" id="whoThemBtn" onclick="setLogWho('them')">
+            📝 Logging as <span id="whoThemName">Rival</span>
+          </button>
+        </div>
+
+        <!-- Fields -->
+        <div class="log-grid">
+          <div class="log-item mand">
+            <div class="log-item-hdr">
+              <div class="log-item-lbl">💪 Physical Health</div>
+              <div class="pts-badge pts-badge-green">+20 pts</div>
+            </div>
+            <textarea class="log-field-input" id="fieldPhys" rows="2"
+              placeholder="Describe your workout or activity..."></textarea>
+          </div>
+          <div class="log-item mand">
+            <div class="log-item-hdr">
+              <div class="log-item-lbl">📖 Mental Clarity</div>
+              <div class="pts-badge pts-badge-green">+20 pts</div>
+            </div>
+            <input class="log-field-input" id="fieldMent" type="text"
+              placeholder="Book title or resource name...">
+            <input class="log-field-input" id="fieldMentLink" type="url"
+              placeholder="Proof link (optional)..." style="margin-top:6px">
+          </div>
+        </div>
+        <div class="log-item opt" style="margin-bottom:12px">
+          <div class="log-item-hdr">
+            <div class="log-item-lbl">💰 Financial Security <span style="font-size:9px;color:var(--text3);margin-left:4px">(Optional)</span></div>
+            <div class="pts-badge pts-badge-amber">+10 pts</div>
+          </div>
+          <input class="log-field-input" id="fieldFin" type="text"
+            placeholder="Budget, savings, investment activity...">
+        </div>
+        <div id="alreadyLoggedMsg" class="already-logged-msg hidden">
+          ✅ Already logged today! Come back tomorrow.
+        </div>
+        <button class="submit-btn" id="submitBtn" onclick="submitLog()">
+          Submit Log →
+        </button>
+      </div>
+    </div>
+
+    <!-- ── HISTORY PANEL ───────────────────────────────────────── -->
+    <div class="tab-panel" id="panel-history">
+      <div class="cal-card">
+        <div class="cal-hdr">
+          <div class="cal-title" id="calTitle">— 2026</div>
+          <div class="cal-nav">
+            <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
+            <button class="cal-nav-btn" onclick="changeMonth(1)">›</button>
+          </div>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+        <div class="cal-legend">
+          <div class="cal-leg"><div class="cal-leg-dot" style="background:var(--green2)"></div>Both logged</div>
+          <div class="cal-leg"><div class="cal-leg-dot" style="background:var(--amber2)"></div>One logged</div>
+          <div class="cal-leg"><div class="cal-leg-dot" style="background:var(--red3)"></div>Both missed</div>
+          <div class="cal-leg"><div class="cal-leg-dot" style="background:var(--bg3)"></div>Future</div>
+        </div>
+      </div>
+
+      <!-- Trend chart -->
+      <div class="chart-card">
+        <div class="chart-card-title">Daily points — last 14 days</div>
+        <div style="position:relative;height:180px">
+          <canvas id="trendChart"></canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-leg-item"><div class="chart-leg-dot" style="background:#2ecc71"></div><span id="legendYou">You</span></div>
+          <div class="chart-leg-item"><div class="chart-leg-dot" style="background:#9b6dff"></div><span id="legendThem">Rival</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── STATS PANEL ─────────────────────────────────────────── -->
+    <div class="tab-panel" id="panel-stats">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-val you-color mono" id="statStreakYou">0</div>
+          <div class="stat-lbl" id="statStreakYouLbl">Your Streak (days)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val them-color mono" id="statStreakThem">0</div>
+          <div class="stat-lbl" id="statStreakThemLbl">Rival Streak (days)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val mono" id="statDaysTotal">0</div>
+          <div class="stat-lbl">Days Tracked</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val you-color mono" id="statTotalYou">0</div>
+          <div class="stat-lbl" id="statTotalYouLbl">Your All-time pts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val them-color mono" id="statTotalThem">0</div>
+          <div class="stat-lbl" id="statTotalThemLbl">Rival All-time pts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-val mono" id="statLead">—</div>
+          <div class="stat-lbl" id="statLeadLbl">All-time Lead</div>
+        </div>
+      </div>
+
+      <!-- Pillar breakdown -->
+      <div class="chart-card">
+        <div class="chart-card-title">All-time pillar breakdown</div>
+        <div style="position:relative;height:200px">
+          <canvas id="pillarChart"></canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-leg-item"><div class="chart-leg-dot" style="background:#2ecc71"></div><span id="pillarLegYou">You</span></div>
+          <div class="chart-leg-item"><div class="chart-leg-dot" style="background:#9b6dff"></div><span id="pillarLegThem">Rival</span></div>
+        </div>
+      </div>
+
+
+      <!-- Cumulative -->
+      <div class="chart-card">
+        <div class="chart-card-title">Cumulative point race</div>
+        <div style="position:relative;height:200px">
+          <canvas id="cumulChart"></canvas>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-leg-item"><div class="chart-leg-dot" style="background:#2ecc71"></div><span id="cumulLegYou">You</span></div>
+          <div class="chart-leg-item"><div class="chart-leg-dot" style="background:#9b6dff"></div><span id="cumulLegThem">Rival</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<!-- TOAST -->
+<div class="toast" id="toast">✅ <span id="toastMsg">Done!</span></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  // ── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────────
+  const firebaseConfig = {
+    apiKey: "AIzaSyAh49kWjtOBU-PlLKtuKnc5VFwEVhQWS18",
+    authDomain: "ag-tracker-3c6bf.firebaseapp.com",
+    databaseURL: "https://ag-tracker-3c6bf-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ag-tracker-3c6bf",
+    storageBucket: "ag-tracker-3c6bf.firebasestorage.app",
+    messagingSenderId: "957621143819",
+    appId: "1:957621143819:web:c69c784aef0f7359077a0e"
+  };
+  // ─────────────────────────────────────────────────────────────────
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  // Expose helpers to global scope so non-module scripts can call them
+  window._fbSet = (path, value) => set(ref(db, path), value);
+  window._fbListen = (path, cb) => onValue(ref(db, path), snap => cb(snap.val()));
+  window._fbGet = async (path) => {
+    const snap = await get(ref(db, path));
+    return snap.val();
+  };
+  window._fbReady = true;
+  document.dispatchEvent(new Event('firebase-ready'));
+</script>
+
+<!-- Chart.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+<script>
+/* ══════════════════════════════════════════════════════════════
+   CONSTANTS
+══════════════════════════════════════════════════════════════ */
+const PTS_PHYSICAL = 20;
+const PTS_MENTAL   = 20;
+const PTS_FINANCIAL = 10;
+const MAX_PTS_DAY   = 50; // 20+20+10
+const LEVELS = [
+  { min:0,   max:49,   label:'Lv 1',  cls:'lv1', title:'Rookie' },
+  { min:50,  max:149,  label:'Lv 2',  cls:'lv2', title:'Grinder' },
+  { min:150, max:299,  label:'Lv 3',  cls:'lv3', title:'Consistent' },
+  { min:300, max:499,  label:'Lv 4',  cls:'lv4', title:'Disciplined' },
+  { min:500, max:799,  label:'Lv 5',  cls:'lv5', title:'Elite' },
+  { min:800, max:Infinity, label:'Lv 6', cls:'lv6', title:'Legend' },
+];
+
+/* ══════════════════════════════════════════════════════════════
+   STATE
+══════════════════════════════════════════════════════════════ */
+let state = {
+  nameYou:  '',
+  nameThem: '',
+  logs: {}       // { "YYYY-MM-DD": { you: {phys,ment,mentLink,fin}, them: {...} } }
+};
+
+let logWho = 'you';        // who is currently filling the form
+let calYear, calMonth;
+let trendChartObj = null;
+let pillarChartObj = null;
+let cumulChartObj  = null;
+let statsRendered  = false;
+
+/* ══════════════════════════════════════════════════════════════
+   FIREBASE STORAGE  (replaces localStorage)
+══════════════════════════════════════════════════════════════ */
+// myRole: 'you' or 'them' — who THIS device is logged in as
+let myRole = null;
+
+async function saveState() {
+  // Persist the full state object to Firebase under /session
+  if (!window._fbSet) return;
+  await window._fbSet('session', {
+    nameYou:  state.nameYou,
+    nameThem: state.nameThem,
+    logs:     state.logs
+  });
+}
+
+function listenToState() {
+  // Real-time listener — any change from the other device updates us instantly
+  window._fbListen('session', (data) => {
+    if (!data) return;
+    state.nameYou  = data.nameYou  || state.nameYou;
+    state.nameThem = data.nameThem || state.nameThem;
+    state.logs     = data.logs     || {};
+    if (document.getElementById('app').classList.contains('visible')) {
+      refreshUI();
+      statsRendered = false;
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   DATE HELPERS
+══════════════════════════════════════════════════════════════ */
+function todayKey() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10); // YYYY-MM-DD
+}
+function keyToDate(key) {
+  const [y,m,d] = key.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function dateToKey(d) {
+  return d.toISOString().slice(0,10);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SCORING
+══════════════════════════════════════════════════════════════ */
+function calcDayScore(entry) {
+  // entry: { phys, ment, fin }
+  let pts = 0;
+  if (entry && entry.phys && entry.phys.trim()) pts += PTS_PHYSICAL;
+  if (entry && entry.ment && entry.ment.trim()) pts += PTS_MENTAL;
+  if (entry && entry.fin  && entry.fin.trim())  pts += PTS_FINANCIAL;
+  return pts;
+}
+
+function allTimeTotal(who) {
+  return Object.values(state.logs)
+    .map(day => calcDayScore(day[who] || {}))
+    .reduce((a,b) => a+b, 0);
+}
+
+function pillarTotal(who, pillar) {
+  let pts = 0;
+  const ptsMap = { phys: PTS_PHYSICAL, ment: PTS_MENTAL, fin: PTS_FINANCIAL };
+  for (const day of Object.values(state.logs)) {
+    const e = day[who];
+    if (e && e[pillar] && e[pillar].trim()) pts += ptsMap[pillar];
+  }
+  return pts;
+}
+
+function getLevel(totalPts) {
+  return LEVELS.find(l => totalPts >= l.min && totalPts <= l.max) || LEVELS[0];
+}
+
+function getStreak(who) {
+  const keys = Object.keys(state.logs).sort().reverse();
+  let streak = 0;
+  const today = todayKey();
+  for (let i = 0; i < keys.length; i++) {
+    const k = keys[i];
+    if (i === 0 && k !== today) break; // must start from today or yesterday
+    const entry = state.logs[k][who] || {};
+    const pts = calcDayScore(entry);
+    // Streak counts full mandatory (both phys+ment logged)
+    const full = !!(entry.phys && entry.phys.trim() && entry.ment && entry.ment.trim());
+    if (full) { streak++; }
+    else { if (i === 0 && k === today) { streak = 0; } else { break; } }
+  }
+  return streak;
+}
+
+function getConsistencyRate(who) {
+  const keys = Object.keys(state.logs).sort();
+  if (!keys.length) return null;
+  let fullDays = 0;
+  for (const k of keys) {
+    const e = state.logs[k][who] || {};
+    if (e.phys && e.phys.trim() && e.ment && e.ment.trim()) fullDays++;
+  }
+  return Math.round((fullDays / keys.length) * 100);
+}
+
+function getLast7Keys() {
+  const keys = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    keys.push(dateToKey(d));
+  }
+  return keys;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   INITIALS
+══════════════════════════════════════════════════════════════ */
+function initials(name) {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+  return name.slice(0,2).toUpperCase();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LOGIN  (multi-device, Firebase-backed)
+══════════════════════════════════════════════════════════════ */
+
+// Called once Firebase module fires 'firebase-ready'
+async function initLogin() {
+  showCard('loadingCard');
+
+  // Try to fetch existing session from Firebase
+  const existing = await window._fbGet('session');
+
+  if (existing && existing.nameYou && existing.nameThem) {
+    // Session already exists — let this device pick its player
+    state.nameYou  = existing.nameYou;
+    state.nameThem = existing.nameThem;
+    state.logs     = existing.logs || {};
+    showJoinScreen();
+  } else {
+    // No session yet — show first-time setup
+    showCard('setupCard');
+  }
+}
+
+function showCard(id) {
+  ['setupCard','joinCard','loadingCard'].forEach(c => {
+    document.getElementById(c).classList.toggle('hidden', c !== id);
+  });
+}
+
+function showJoinScreen() {
+  const wrap = document.getElementById('joinBtnWrap');
+  wrap.innerHTML = '';
+
+  // Player 1 button
+  const b1 = document.createElement('button');
+  b1.className = 'login-btn';
+  b1.style.background = 'var(--green)';
+  b1.textContent = '🟢 I am ' + state.nameYou + ' (Player 1)';
+  b1.onclick = () => joinAs('you');
+  wrap.appendChild(b1);
+
+  // Player 2 button
+  const b2 = document.createElement('button');
+  b2.className = 'login-btn';
+  b2.style.background = 'var(--purple)';
+  b2.textContent = '🟣 I am ' + state.nameThem + ' (Player 2)';
+  b2.onclick = () => joinAs('them');
+  wrap.appendChild(b2);
+
+  showCard('joinCard');
+}
+
+// First-time setup: create the session in Firebase
+async function createSession() {
+  const ny = document.getElementById('nameYou').value.trim();
+  const nt = document.getElementById('nameThem').value.trim();
+  if (!ny || !nt)  { showToast('Enter both names!', 'error'); return; }
+  if (ny.toLowerCase() === nt.toLowerCase()) { showToast('Names must be different!', 'error'); return; }
+  state.nameYou  = ny;
+  state.nameThem = nt;
+  state.logs     = {};
+  showCard('loadingCard');
+  await saveState();
+  showJoinScreen();
+}
+
+// Pick which player you are on this device and launch
+function joinAs(role) {
+  myRole = role;
+  // Remember role in sessionStorage so a refresh doesn't lose it
+  sessionStorage.setItem('ag_myRole', role);
+  listenToState();
+  launchApp();
+}
+
+function logout() {
+  if (!confirm('Leave this session on this device? (Data stays in Firebase — just re-join.)')) return;
+  sessionStorage.removeItem('ag_myRole');
+  location.reload();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LAUNCH
+══════════════════════════════════════════════════════════════ */
+function launchApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  const appEl = document.getElementById('app');
+  appEl.classList.add('visible');
+
+  // Set today's date
+  const now = new Date();
+  document.getElementById('topDate').textContent = now.toLocaleDateString('en-IN', {
+    weekday:'short', day:'numeric', month:'short', year:'numeric'
+  });
+
+  // Names
+  document.getElementById('gapNameYou').textContent  = state.nameYou.toUpperCase();
+  document.getElementById('gapNameThem').textContent = state.nameThem.toUpperCase();
+  document.getElementById('gapLabelL').textContent   = state.nameYou.toUpperCase();
+  document.getElementById('gapLabelR').textContent   = state.nameThem.toUpperCase();
+  document.getElementById('whoYouName').textContent  = state.nameYou;
+  document.getElementById('whoThemName').textContent = state.nameThem;
+  document.getElementById('legendYou').textContent   = state.nameYou;
+  document.getElementById('legendThem').textContent  = state.nameThem;
+  document.getElementById('pillarLegYou').textContent  = state.nameYou;
+  document.getElementById('pillarLegThem').textContent = state.nameThem;
+  document.getElementById('cumulLegYou').textContent   = state.nameYou;
+  document.getElementById('cumulLegThem').textContent  = state.nameThem;
+  document.getElementById('statStreakYouLbl').textContent  = state.nameYou + ' streak (days)';
+  document.getElementById('statStreakThemLbl').textContent = state.nameThem + ' streak (days)';
+  document.getElementById('statTotalYouLbl').textContent   = state.nameYou + ' all-time pts';
+  document.getElementById('statTotalThemLbl').textContent  = state.nameThem + ' all-time pts';
+
+  // If this device has a fixed role, auto-set log who and hide the toggle
+  if (myRole) {
+    logWho = myRole;
+    const youBtn  = document.getElementById('whoYouBtn');
+    const themBtn = document.getElementById('whoThemBtn');
+    // Show only the device-owner's button as active, disable the other
+    youBtn.disabled  = myRole !== 'you';
+    themBtn.disabled = myRole !== 'them';
+    youBtn.style.opacity  = myRole === 'you'  ? '1' : '0.35';
+    themBtn.style.opacity = myRole === 'them' ? '1' : '0.35';
+    // Show a "you are" badge in topbar
+    const badge = document.createElement('div');
+    badge.className = 'topbar-date';
+    badge.style.color = myRole === 'you' ? 'var(--green)' : 'var(--purple)';
+    badge.textContent = '👤 ' + (myRole === 'you' ? state.nameYou : state.nameThem);
+    document.getElementById('topDate').insertAdjacentElement('beforebegin', badge);
+  }
+
+  // Calendar init
+  calYear  = now.getFullYear();
+  calMonth = now.getMonth();
+
+  // Log who = myRole or 'you' by default
+  setLogWho(myRole || 'you');
+
+  refreshUI();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   REFRESH ALL UI
+══════════════════════════════════════════════════════════════ */
+function refreshUI() {
+  updateGapHero();
+  updatePlayerCards();
+  updateLogForm();
+}
+
+function updateGapHero() {
+  const tk = todayKey();
+  const dayLog = state.logs[tk] || {};
+
+  const youEntry  = dayLog.you  || {};
+  const themEntry = dayLog.them || {};
+  const youPts    = calcDayScore(youEntry);
+  const themPts   = calcDayScore(themEntry);
+
+  document.getElementById('gapScoreYou').textContent  = youPts;
+  document.getElementById('gapScoreThem').textContent = themPts;
+
+  // Bar fill (you's share)
+  const total = youPts + themPts;
+  let fillPct = total === 0 ? 50 : Math.round((youPts / total) * 100);
+  document.getElementById('gapFill').style.width = fillPct + '%';
+
+  // Delta
+  const delta = youPts - themPts;
+  const deltaEl = document.getElementById('gapDelta');
+  const deltaLblEl = document.getElementById('gapDeltaLabel');
+  if (delta === 0) {
+    deltaEl.textContent = '=';
+    deltaEl.style.color = 'var(--text2)';
+    deltaLblEl.textContent = 'TIED TODAY';
+  } else if (delta > 0) {
+    deltaEl.textContent = '+' + delta;
+    deltaEl.style.color = 'var(--green)';
+    deltaLblEl.textContent = state.nameYou.toUpperCase() + ' LEADS';
+  } else {
+    deltaEl.textContent = delta;
+    deltaEl.style.color = 'var(--red)';
+    deltaLblEl.textContent = state.nameThem.toUpperCase() + ' LEADS';
+  }
+
+  // All-time
+  const atYou  = allTimeTotal('you');
+  const atThem = allTimeTotal('them');
+  document.getElementById('gapWeekYou').textContent  = atYou;
+  document.getElementById('gapWeekThem').textContent = atThem;
+}
+
+function updatePlayerCards() {
+  const tk = todayKey();
+  const dayLog = state.logs[tk] || {};
+
+  ['you','them'].forEach(who => {
+    const entry = dayLog[who] || {};
+    const pts   = calcDayScore(entry);
+    const atPts = allTimeTotal(who);
+    const lvl   = getLevel(atPts);
+    const streak = getStreak(who);
+    const rate   = getConsistencyRate(who);
+    const isYou  = who === 'you';
+    const name   = isYou ? state.nameYou : state.nameThem;
+    const sfx    = isYou ? 'You' : 'Them';
+
+    // Avatar
+    const avatarEl = document.getElementById('avatar' + sfx);
+    if (avatarEl) avatarEl.textContent = initials(name);
+
+    // Name + level
+    const nameEl = document.getElementById('cardName' + sfx);
+    if (nameEl) {
+      nameEl.textContent = name + ' ';
+      const lvlSpan = document.createElement('span');
+      lvlSpan.className = 'level-badge ' + lvl.cls;
+      lvlSpan.textContent = lvl.label + ' ' + lvl.title;
+      nameEl.appendChild(lvlSpan);
+    }
+
+    // Tag
+    const tagEl = document.getElementById('cardTag' + sfx);
+    if (tagEl) tagEl.textContent = pts + ' pts logged today';
+
+    // Score
+    const scoreEl = document.getElementById('cardScore' + sfx);
+    if (scoreEl) scoreEl.textContent = pts;
+
+    // Pillars
+    setPillar(sfx, 'Phys', entry.phys, PTS_PHYSICAL, false);
+    setPillar(sfx, 'Ment', entry.ment, PTS_MENTAL, false);
+    setPillar(sfx, 'Fin',  entry.fin,  PTS_FINANCIAL, true);
+
+    // Streak
+    const streakEl = document.getElementById('streak' + sfx);
+    if (streakEl) streakEl.textContent = streak;
+    const rateEl = document.getElementById('rate' + sfx);
+    if (rateEl) rateEl.textContent = rate !== null ? rate + '%' : '—';
+
+    // Streak bar
+    buildStreakBar('streakBar' + sfx, who, isYou);
+  });
+}
+
+function setPillar(sfx, pillar, val, pts, isOptional) {
+  const descEl  = document.getElementById((sfx === 'You' ? 'you' : 'them') + pillar + 'Desc');
+  const ptsEl   = document.getElementById((sfx === 'You' ? 'you' : 'them') + pillar + 'Pts');
+  const badgeEl = document.getElementById((sfx === 'You' ? 'you' : 'them') + pillar + 'Badge');
+  if (!descEl) return;
+
+  const logged = val && val.trim();
+  if (logged) {
+    descEl.textContent = val.trim().slice(0, 40);
+    ptsEl.textContent  = '+' + pts;
+    ptsEl.className    = 'pillar-pts ' + (isOptional ? 'pts-bonus' : 'pts-done');
+    badgeEl.textContent = isOptional ? 'Bonus' : 'Logged';
+    badgeEl.className  = 'badge ' + (isOptional ? 'badge-bonus' : 'badge-logged');
+  } else {
+    descEl.textContent  = isOptional ? '(Not logged)' : 'Not logged yet';
+    descEl.style.color  = 'var(--text3)';
+    ptsEl.textContent   = '+0';
+    ptsEl.className     = 'pillar-pts pts-empty';
+    badgeEl.textContent = isOptional ? 'Optional' : 'Missing';
+    badgeEl.className   = 'badge ' + (isOptional ? 'badge-skip' : 'badge-missing');
+  }
+}
+
+function buildStreakBar(elId, who, isYou) {
+  const wrap = document.getElementById(elId);
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  const keys = getLast7Keys();
+  keys.forEach(k => {
+    const div = document.createElement('div');
+    div.className = 'streak-day';
+    const e = (state.logs[k] || {})[who] || {};
+    const full = !!(e.phys && e.phys.trim() && e.ment && e.ment.trim());
+    const partial = !full && (
+      (e.phys && e.phys.trim()) || (e.ment && e.ment.trim())
+    );
+    if (full) div.className += isYou ? ' s-full-you' : ' s-full-them';
+    else if (partial) div.className += ' s-partial';
+    wrap.appendChild(div);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   LOG FORM
+══════════════════════════════════════════════════════════════ */
+function setLogWho(who) {
+  logWho = who;
+  const youBtn  = document.getElementById('whoYouBtn');
+  const themBtn = document.getElementById('whoThemBtn');
+  youBtn.className  = 'log-who-btn' + (who === 'you'  ? ' active-you'  : '');
+  themBtn.className = 'log-who-btn' + (who === 'them' ? ' active-them' : '');
+
+  // Update input focus style
+  document.querySelectorAll('.log-field-input').forEach(el => {
+    if (who === 'them') el.classList.add('them-focus');
+    else el.classList.remove('them-focus');
+  });
+
+  // Update submit button color
+  const btn = document.getElementById('submitBtn');
+  btn.className = 'submit-btn' + (who === 'them' ? ' them-btn' : '');
+
+  updateLogForm();
+}
+
+function updateLogForm() {
+  const tk = todayKey();
+  const dayLog = state.logs[tk] || {};
+  const activeWho = myRole || logWho;
+  const entry  = dayLog[activeWho] || {};
+  const alreadyMsg  = document.getElementById('alreadyLoggedMsg');
+  const submitBtn   = document.getElementById('submitBtn');
+
+  // Check if this person already logged today
+  const logged = entry.phys && entry.phys.trim() && entry.ment && entry.ment.trim();
+
+  if (logged) {
+    alreadyMsg.classList.remove('hidden');
+    alreadyMsg.className = 'already-logged-msg' + (activeWho === 'them' ? ' them-msg' : '');
+    alreadyMsg.textContent = '✅ ' + (activeWho === 'you' ? state.nameYou : state.nameThem) + ' already logged today! Come back tomorrow.';
+    submitBtn.classList.add('hidden');
+    // Fill in existing values
+    document.getElementById('fieldPhys').value = entry.phys || '';
+    document.getElementById('fieldMent').value = entry.ment || '';
+    document.getElementById('fieldMentLink').value = entry.mentLink || '';
+    document.getElementById('fieldFin').value  = entry.fin  || '';
+    document.querySelectorAll('.log-field-input').forEach(el => el.disabled = true);
+  } else {
+    alreadyMsg.classList.add('hidden');
+    submitBtn.classList.remove('hidden');
+    // Clear fields for new entry
+    document.getElementById('fieldPhys').value = '';
+    document.getElementById('fieldMent').value = '';
+    document.getElementById('fieldMentLink').value = '';
+    document.getElementById('fieldFin').value  = '';
+    document.querySelectorAll('.log-field-input').forEach(el => el.disabled = false);
+  }
+}
+
+function submitLog() {
+  const phys = document.getElementById('fieldPhys').value.trim();
+  const ment = document.getElementById('fieldMent').value.trim();
+  const mentLink = document.getElementById('fieldMentLink').value.trim();
+  const fin  = document.getElementById('fieldFin').value.trim();
+
+  if (!phys) { showToast('Physical log is required!', 'error'); return; }
+  if (!ment) { showToast('Mental clarity log is required!', 'error'); return; }
+
+  // On a dedicated-device setup, only log for your own role
+  const whoToLog = myRole || logWho;
+
+  const tk = todayKey();
+  if (!state.logs[tk]) state.logs[tk] = {};
+
+  state.logs[tk][whoToLog] = { phys, ment, mentLink, fin };
+  saveState(); // push to Firebase
+
+  const pts = calcDayScore(state.logs[tk][whoToLog]);
+  const name = whoToLog === 'you' ? state.nameYou : state.nameThem;
+  showToast('✅ ' + name + ' logged ' + pts + ' pts today!', whoToLog === 'them' ? 'them' : 'ok');
+  statsRendered = false;
+  refreshUI();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════════════════════════════ */
+function switchTab(id) {
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    const ids = ['today','history','stats'];
+    b.classList.toggle('active', ids[i] === id);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+
+  if (id === 'history') renderHistory();
+  if (id === 'stats')   renderStats();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   CALENDAR
+══════════════════════════════════════════════════════════════ */
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  renderHistory();
+}
+
+function renderHistory() {
+  const grid = document.getElementById('calGrid');
+  const title = document.getElementById('calTitle');
+  const dt = new Date(calYear, calMonth, 1);
+  title.textContent = dt.toLocaleDateString('en-US', { month:'long', year:'numeric' });
+  grid.innerHTML = '';
+
+  // Day names
+  ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].forEach(d => {
+    const el = document.createElement('div');
+    el.className = 'cal-dayname';
+    el.textContent = d;
+    grid.appendChild(el);
+  });
+
+  // Blank days
+  const firstDow = (new Date(calYear, calMonth, 1).getDay() + 6) % 7; // Mon=0
+  for (let i = 0; i < firstDow; i++) {
+    const el = document.createElement('div');
+    el.className = 'cal-day cd-empty';
+    grid.appendChild(el);
+  }
+
+  // Days
+  const totalDays = new Date(calYear, calMonth + 1, 0).getDate();
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  for (let d = 1; d <= totalDays; d++) {
+    const date = new Date(calYear, calMonth, d);
+    date.setHours(0,0,0,0);
+    const key = dateToKey(date);
+    const el  = document.createElement('div');
+    el.className = 'cal-day';
+
+    const isFuture = date > today;
+    const isToday  = date.getTime() === today.getTime();
+
+    if (isFuture) {
+      el.classList.add('cd-future');
+    } else {
+      const dayLog = state.logs[key] || {};
+      const youFull  = !!(dayLog.you  && dayLog.you.phys  && dayLog.you.ment);
+      const themFull = !!(dayLog.them && dayLog.them.phys && dayLog.them.ment);
+      if (youFull && themFull)       el.classList.add('cd-full');
+      else if (youFull || themFull)  el.classList.add('cd-half');
+      else if (state.logs[key])      el.classList.add('cd-miss');
+      else                           el.classList.add('cd-future'); // no log = not started
+    }
+    if (isToday) el.classList.add('cd-today');
+    el.textContent = d;
+    grid.appendChild(el);
+  }
+
+  renderTrendChart();
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TREND CHART (history)
+══════════════════════════════════════════════════════════════ */
+function renderTrendChart() {
+  const keys = [];
+  const labels = [];
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const k = dateToKey(d);
+    keys.push(k);
+    labels.push(d.toLocaleDateString('en-US', { month:'short', day:'numeric' }));
+  }
+
+  const youData  = keys.map(k => calcDayScore((state.logs[k] || {}).you  || {}));
+  const themData = keys.map(k => calcDayScore((state.logs[k] || {}).them || {}));
+
+  const ctx = document.getElementById('trendChart').getContext('2d');
+  if (trendChartObj) { trendChartObj.destroy(); trendChartObj = null; }
+
+  trendChartObj = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: state.nameYou,
+          data: youData,
+          borderColor: '#2ecc71',
+          backgroundColor: 'rgba(46,204,113,0.07)',
+          fill: true, tension: 0.3,
+          borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#2ecc71'
+        },
+        {
+          label: state.nameThem,
+          data: themData,
+          borderColor: '#9b6dff',
+          backgroundColor: 'rgba(155,109,255,0.05)',
+          fill: true, tension: 0.3,
+          borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#9b6dff'
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#555', font: { size: 10 }, maxRotation: 45, autoSkip: true }, grid: { color: '#1a1a1a' } },
+        y: { min: 0, max: MAX_PTS_DAY, ticks: { color: '#555', font: { size: 10 } }, grid: { color: '#1a1a1a' } }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   STATS
+══════════════════════════════════════════════════════════════ */
+function renderStats() {
+  const atYou  = allTimeTotal('you');
+  const atThem = allTimeTotal('them');
+  const delta  = atYou - atThem;
+  const totalDays = Object.keys(state.logs).length;
+
+  document.getElementById('statStreakYou').textContent  = getStreak('you');
+  document.getElementById('statStreakThem').textContent = getStreak('them');
+  document.getElementById('statDaysTotal').textContent  = totalDays;
+  document.getElementById('statTotalYou').textContent   = atYou;
+  document.getElementById('statTotalThem').textContent  = atThem;
+
+  const leadEl   = document.getElementById('statLead');
+  const leadLbl  = document.getElementById('statLeadLbl');
+  if (delta === 0) {
+    leadEl.textContent  = '=';
+    leadEl.style.color  = 'var(--text2)';
+    leadLbl.textContent = 'All-time (tied)';
+  } else if (delta > 0) {
+    leadEl.textContent  = '+' + delta;
+    leadEl.style.color  = 'var(--green)';
+    leadLbl.textContent = state.nameYou + ' leads';
+  } else {
+    leadEl.textContent  = delta;
+    leadEl.style.color  = 'var(--red)';
+    leadLbl.textContent = state.nameThem + ' leads';
+  }
+
+  renderPillarChart();
+  renderCumulChart();
+}
+
+function renderPillarChart() {
+  const ctx = document.getElementById('pillarChart').getContext('2d');
+  if (pillarChartObj) { pillarChartObj.destroy(); pillarChartObj = null; }
+  pillarChartObj = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Physical', 'Mental', 'Financial'],
+      datasets: [
+        {
+          label: state.nameYou,
+          data: [pillarTotal('you','phys'), pillarTotal('you','ment'), pillarTotal('you','fin')],
+          backgroundColor: '#2ecc71', borderRadius: 4
+        },
+        {
+          label: state.nameThem,
+          data: [pillarTotal('them','phys'), pillarTotal('them','ment'), pillarTotal('them','fin')],
+          backgroundColor: '#9b6dff', borderRadius: 4
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#555', font: { size: 11 } }, grid: { color: '#1a1a1a' } },
+        y: { ticks: { color: '#555', font: { size: 10 } }, grid: { color: '#1a1a1a' } }
+      }
+    }
+  });
+}
+
+function renderCumulChart() {
+  const sortedKeys = Object.keys(state.logs).sort();
+  const labels = sortedKeys.map(k => {
+    const d = keyToDate(k);
+    return d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+  });
+
+  let cumYou = 0, cumThem = 0;
+  const youCumul  = sortedKeys.map(k => { cumYou  += calcDayScore((state.logs[k].you  || {})); return cumYou; });
+  const themCumul = sortedKeys.map(k => { cumThem += calcDayScore((state.logs[k].them || {})); return cumThem; });
+
+  const ctx = document.getElementById('cumulChart').getContext('2d');
+  if (cumulChartObj) { cumulChartObj.destroy(); cumulChartObj = null; }
+
+  if (sortedKeys.length === 0) {
+    cumulChartObj = new Chart(ctx, {
+      type: 'line',
+      data: { labels: ['No data yet'], datasets: [] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+    return;
+  }
+
+  cumulChartObj = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: state.nameYou,
+          data: youCumul,
+          borderColor: '#2ecc71', backgroundColor: 'rgba(46,204,113,0.08)',
+          fill: true, tension: 0.3, borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#2ecc71'
+        },
+        {
+          label: state.nameThem,
+          data: themCumul,
+          borderColor: '#9b6dff', backgroundColor: 'rgba(155,109,255,0.05)',
+          fill: true, tension: 0.3, borderWidth: 2, pointRadius: 3, pointBackgroundColor: '#9b6dff'
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { ticks: { color: '#555', font: { size: 10 }, maxRotation: 45, autoSkip: true }, grid: { color: '#1a1a1a' } },
+        y: { ticks: { color: '#555', font: { size: 10 } }, grid: { color: '#1a1a1a' } }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════════════════ */
+let toastTimer = null;
+function showToast(msg, type) {
+  const el = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  el.className = 'toast toast-show' + (type === 'error' ? ' toast-error' : type === 'them' ? ' toast-them' : '');
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.classList.remove('toast-show'); }, 3000);
+}
+
+/* ══════════════════════════════════════════════════════════════
+   BOOT  — wait for Firebase, then check session
+══════════════════════════════════════════════════════════════ */
+(function boot() {
+  // If Firebase module already fired (rare), init immediately
+  if (window._fbReady) {
+    resumeOrInit();
+  } else {
+    document.addEventListener('firebase-ready', resumeOrInit, { once: true });
+  }
+})();
+
+async function resumeOrInit() {
+  // Check if this device already picked a role this session
+  const savedRole = sessionStorage.getItem('ag_myRole');
+  if (savedRole) {
+    // Resume without re-asking
+    const existing = await window._fbGet('session');
+    if (existing && existing.nameYou) {
+      state.nameYou  = existing.nameYou;
+      state.nameThem = existing.nameThem;
+      state.logs     = existing.logs || {};
+      myRole = savedRole;
+      listenToState();
+      launchApp();
+      return;
+    }
+  }
+  initLogin();
+}
+</script>
+</body>
+</html>
