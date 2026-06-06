@@ -570,13 +570,13 @@ input, textarea { font-family:'Syne',sans-serif; }
 
   // ── PASTE YOUR FIREBASE CONFIG HERE ─────────────────────────────
   const firebaseConfig = {
-    apiKey:            "PASTE_YOUR_API_KEY",
-    authDomain:        "PASTE_YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL:       "https://PASTE_YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId:         "PASTE_YOUR_PROJECT_ID",
-    storageBucket:     "PASTE_YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "PASTE_YOUR_MESSAGING_SENDER_ID",
-    appId:             "PASTE_YOUR_APP_ID"
+    apiKey: "AIzaSyAh49kWjtOBU-PlLKtuKnc5VFwEVhQWS18",
+    authDomain: "ag-tracker-3c6bf.firebaseapp.com",
+    databaseURL: "https://ag-tracker-3c6bf-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "ag-tracker-3c6bf",
+    storageBucket: "ag-tracker-3c6bf.firebasestorage.app",
+    messagingSenderId: "957621143819",
+    appId: "1:957621143819:web:c69c784aef0f7359077a0e"
   };
   // ────────────────────────────────────────────────────────────────
 
@@ -993,14 +993,15 @@ function toggleCheck(catId) {
   box.classList.toggle('checked');
 }
 
-
 /* ═══════════════════════════════════════════════════════════════
-   isFullyLogged  — “submitted” = user clicked Submit today.
-   All fields are optional; points come only from what was filled.
+   isFullyLogged  — "submitted" = learning + hobby both present
 ═══════════════════════════════════════════════════════════════ */
 function isFullyLogged(entry) {
   if (!entry || typeof entry !== 'object') return false;
-  return entry._submitted === true;
+  return !!(
+    entry.learn && String(entry.learn).trim() &&
+    entry.hobby && String(entry.hobby).trim()
+  );
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1106,6 +1107,9 @@ function submitLog() {
   const hobby = hobbyEl ? hobbyEl.value.trim() : '';
   const fin   = finEl   ? finEl.value.trim()   : '';
 
+  if (!learn) { showToast('Learning log is required!', 'error'); return; }
+  if (!hobby) { showToast('Hobby log is required!', 'error');    return; }
+
   const who = myRole || 'you';
   const tk  = todayKey();
 
@@ -1123,11 +1127,10 @@ function submitLog() {
     learn,
     hobby,
     fin,
-    phys:       getCheck('phys'),
-    sleep:      getCheck('sleep'),
-    disc:       getCheck('disc'),
-    med:        getCheck('med'),
-    _submitted: true,
+    phys:  getCheck('phys'),
+    sleep: getCheck('sleep'),
+    disc:  getCheck('disc'),
+    med:   getCheck('med'),
   };
 
   saveState();
